@@ -1,0 +1,45 @@
+import pandas as pd
+def load_employee_data(file_path):
+    return pd.read_csv(file_path, encoding='ISO-8859-1') 
+
+class EmployeeCollection:
+    def __init__(self, name):
+        self.name = name
+        self.data = pd.DataFrame()
+
+    def index_data(self, exclude_column):
+        self.indexed_data = self.data.drop(columns=[exclude_column])
+
+    def add_data(self, df):
+        self.data = df
+
+    def search_by_column(self, column_name, column_value):
+        return self.data[self.data[column_name] == column_value]
+
+    def get_count(self):
+        return len(self.data)
+
+    def delete_by_id(self, employee_id):
+        self.data = self.data[self.data["Employee ID"] != employee_id]
+
+    def get_dep_facet(self):
+        return self.data['Department'].value_counts().to_dict()
+
+v_nameCollection = 'Hash_YourName'
+v_phoneCollection = 'Hash_YourPhoneLastFourDigits'
+dataset_path = r'/content/EmployeeSampleData1.csv' 
+employee_df = load_employee_data(dataset_path)
+name_collection = EmployeeCollection(v_nameCollection)
+phone_collection = EmployeeCollection(v_phoneCollection)
+name_collection.add_data(employee_df)
+phone_collection.add_data(employee_df)
+print("Employee Count in name collection:", name_collection.get_count())
+name_collection.index_data('Department')
+phone_collection.index_data('Gender')
+name_collection.delete_by_id('E02003')
+print("Employee Count after deletion in name collection:", name_collection.get_count())
+print("Employees in IT Department:", name_collection.search_by_column('Department', 'IT'))
+print("Male Employees:", name_collection.search_by_column('Gender', 'Male'))
+print("Employees in IT Department in phone collection:", phone_collection.search_by_column('Department', 'IT'))
+print("Department Facet in name collection:", name_collection.get_dep_facet())
+print("Department Facet in phone collection:", phone_collection.get_dep_facet())
